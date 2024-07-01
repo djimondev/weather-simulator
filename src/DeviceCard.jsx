@@ -53,7 +53,7 @@ export const DeviceCard = ({ device, reloadDevices, reloadDevice }) => {
                     title={
                         <Stack spacing={2} direction="row" width={"100%"} justifyContent={"space-between"} alignItems={"start"}>
                             <Stack direction={"column"} justifyContent={"start"} alignItems={"start"}>
-                                <Typography variant="h6">Device {device.name}</Typography>
+                                <Typography variant="h6">{device.name}</Typography>
                                 <Typography variant="body2">{device.id}</Typography>
                             </Stack>
                             <Box width={20} height={6}>
