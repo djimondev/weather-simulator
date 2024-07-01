@@ -2,14 +2,16 @@ import { Stack } from "@mui/material";
 import { useEffect, useState } from "react";
 import "./App.css";
 import DeviceCard from "./DeviceCard";
-import { devices as initialDevices } from "./services/devices";
+import { getDevices } from "./services/devices";
 
 function App() {
-    const [devices, setDevices] = useState(initialDevices);
+    const [devices, setDevices] = useState([]);
 
     useEffect(() => {
-        // fetch API in order to pu new data
-    }, [devices]);
+        getDevices().then(devices => {
+            setDevices(devices);
+        });
+    }, []);
 
     return (
         <Stack spacing={4} direction="row" flexWrap="wrap" useFlexGap justifyContent={"center"}>

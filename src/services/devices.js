@@ -1,37 +1,51 @@
-export const devices = [
-    {
-        id: 1,
-        name: "Device 1",
-        status: "On",
-        temperature: 25,
-        humidity: 40
-    },
-    {
-        id: 2,
-        name: "Device 2",
-        status: "Off",
-        temperature: 30,
-        humidity: 50
-    },
-    {
-        id: 3,
-        name: "Device 3",
-        status: "On",
-        temperature: 27,
-        humidity: 45
-    },
-    {
-        id: 4,
-        name: "Device 4",
-        status: "Off",
-        temperature: 28,
-        humidity: 60
-    },
-    {
-        id: 5,
-        name: "Device 5",
-        status: "On",
-        temperature: 26,
-        humidity: 55
-    }
-];
+const BASE_URL = "http://35.239.214.252:3000";
+
+export const getDevices = async () => {
+    const response = await fetch(`${BASE_URL}/devices`);
+    return response.json();
+};
+
+export const getDevice = async id => {
+    const response = await fetch(`${BASE_URL}/devices/${id}`);
+    return response.json();
+};
+
+export const createDevice = async device => {
+    const response = await fetch(`${BASE_URL}/devices`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(device)
+    });
+    return response.json();
+};
+
+export const updateDevice = async device => {
+    const response = await fetch(`${BASE_URL}/devices/${device.id}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(device)
+    });
+    return response.json();
+};
+
+export const patchDevice = async params => {
+    const response = await fetch(`${BASE_URL}/devices/${device.id}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(params)
+    });
+    return response.json();
+};
+
+export const deleteDevice = async id => {
+    const response = await fetch(`${BASE_URL}/devices/${id}`, {
+        method: "DELETE"
+    });
+    return response.json();
+};

@@ -21,7 +21,7 @@ function DeviceCard({ device, devices, setDevices }) {
                 </Stack>
             </CardContent>
             <CardActions>
-                <Stack spacing={2} direction="column" width={"100%"}>
+                <Stack spacing={2} direction="column" width={"100%"} mx={2}>
                     <ToggleButton
                         value="check"
                         selected={device.status === "On"}
