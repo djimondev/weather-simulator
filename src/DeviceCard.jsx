@@ -1,10 +1,14 @@
-import { Card, CardActions, CardContent, Slider, Stack, ToggleButton, Typography } from "@mui/material";
+import { Card, CardActions, CardContent, CardHeader, CircularProgress, Slider, Stack, ToggleButton, Typography } from "@mui/material";
+import { useState } from "react";
+import { patchDevice } from "./services/devices";
 
-function DeviceCard({ device, devices, setDevices }) {
+export const DeviceCard = ({ device, reloadDevices, reloadDevice }) => {
+    const [isLoading, setIsLoading] = useState(false);
+
     return (
-        <Card style={{ minWidth: "15vw", padding: "30px" }}>
+        <Card style={{ minWidth: "15vw", padding: "0 30px" }}>
+            <CardHeader title={device.name} action={isLoading && <CircularProgress size={20} thickness={5} />}></CardHeader>
             <CardContent>
-                <Typography variant="h4">{device.name}</Typography>
                 <Stack py={2} spacing={1} direction="column" width={"100%"} justifyContent={"center"} alignItems={"center"}>
                     <Stack spacing={2} direction="row" width={"100%"} justifyContent={"center"} alignItems={"center"}>
                         <Typography variant="body1">Status:</Typography>
@@ -26,17 +30,11 @@ function DeviceCard({ device, devices, setDevices }) {
                         value="check"
                         selected={device.status === "On"}
                         onClick={() => {
-                            setDevices(
-                                devices.map(d => {
-                                    if (d.id === device.id) {
-                                        return {
-                                            ...d,
-                                            status: d.status === "On" ? "Off" : "On"
-                                        };
-                                    }
-                                    return d;
-                                })
-                            );
+                            setIsLoading(true);
+                            patchDevice(device.id, { status: device.status === "On" ? "Off" : "On" }).then(() => {
+                                reloadDevices();
+                                setIsLoading(false);
+                            });
                         }}
                     >
                         {device.status === "On" ? "On" : "Off"}
@@ -49,17 +47,13 @@ function DeviceCard({ device, devices, setDevices }) {
                         min={-20}
                         max={70}
                         onChange={e => {
-                            setDevices(
-                                devices.map(d => {
-                                    if (d.id === device.id) {
-                                        return {
-                                            ...d,
-                                            temperature: e.target.value
-                                        };
-                                    }
-                                    return d;
-                                })
-                            );
+                            setIsLoading(true);
+                            patchDevice(device.id, { temperature: e.target.value }).then(() => {
+                                setTimeout(() => {
+                                    reloadDevices();
+                                    setIsLoading(false);
+                                }, 500);
+                            });
                         }}
                     />
                     <Slider
@@ -70,24 +64,17 @@ function DeviceCard({ device, devices, setDevices }) {
                         min={0}
                         max={100}
                         onChange={e => {
-                            setDevices(
-                                devices.map(d => {
-                                    console.log(e.target.value);
-                                    if (d.id === device.id) {
-                                        return {
-                                            ...d,
-                                            humidity: e.target.value
-                                        };
-                                    }
-                                    return d;
-                                })
-                            );
+                            setIsLoading(true);
+                            patchDevice(device.id, { humidity: e.target.value }).then(() => {
+                                setTimeout(() => {
+                                    reloadDevices();
+                                    setIsLoading(false);
+                                }, 500);
+                            });
                         }}
                     />
                 </Stack>
             </CardActions>
         </Card>
     );
-}
-
-export default DeviceCard;
+};

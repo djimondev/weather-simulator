@@ -32,13 +32,13 @@ export const updateDevice = async device => {
     return response.json();
 };
 
-export const patchDevice = async params => {
-    const response = await fetch(`${BASE_URL}/devices/${device.id}`, {
+export const patchDevice = async (id, param) => {
+    const response = await fetch(`${BASE_URL}/devices/${id}`, {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(params)
+        body: JSON.stringify(param)
     });
     return response.json();
 };
