@@ -31,12 +31,10 @@ export const DeviceCard = ({ device, reloadDevices, reloadDevice }) => {
     };
 
     const performDelete = () => {
-        patchDevice(device.id, { status: "Off" }).then(() => {
-            setTimeout(() => {
-                deleteDevice(device.id).then(() => {
-                    reloadDevices(true);
-                });
-            }, 500);
+        setIsLoading(true);
+        deleteDevice(device.id).then(() => {
+            reloadDevices(true);
+            setIsLoading(false);
         });
     };
 
