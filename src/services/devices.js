@@ -1,4 +1,4 @@
-const BASE_URL = "http://35.239.214.252:3000";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export const getDevices = async () => {
     const response = await fetch(`${BASE_URL}/devices`);
