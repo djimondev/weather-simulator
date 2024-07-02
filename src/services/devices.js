@@ -35,6 +35,20 @@ export const updateDevice = async device => {
     return response.json();
 };
 
+export const addValuesInDevice = async (id, param) => {
+    const response = await fetch(`${BASE_URL}/devices/${id}/xxxxxxx`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            ...param,
+            updatedAt: new Date()
+        })
+    });
+    return response.json();
+};
+
 export const patchDevice = async (id, param) => {
     const response = await fetch(`${BASE_URL}/devices/${id}`, {
         method: "PATCH",

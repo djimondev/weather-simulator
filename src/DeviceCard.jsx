@@ -37,6 +37,9 @@ export const DeviceCard = ({ device, reloadDevices, reloadDevice, client, connec
             data.humidity !== undefined && setHumidity(Number(data.humidity));
             data.status !== undefined && setStatus(data.status);
             setIsFocused(true);
+            setTimeout(() => {
+                setIsFocused(false);
+            }, 500);
         } catch (error) {
             console.log(error);
         }
