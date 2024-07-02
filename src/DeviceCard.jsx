@@ -17,7 +17,9 @@ import {
 import { useState } from "react";
 import { deleteDevice, patchDevice } from "./services/devices";
 
-export const DeviceCard = ({ device, reloadDevices, reloadDevice }) => {
+const MQTT_TOPIC = import.meta.env.VITE_MQTT_TOPIC;
+
+export const DeviceCard = ({ device, reloadDevices, reloadDevice, client }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
 
@@ -91,11 +93,12 @@ export const DeviceCard = ({ device, reloadDevices, reloadDevice }) => {
                             value="check"
                             selected={device.status === "On"}
                             onClick={() => {
-                                setIsLoading(true);
-                                patchDevice(device.id, { status: device.status === "On" ? "Off" : "On" }).then(() => {
-                                    reloadDevices();
-                                    setIsLoading(false);
-                                });
+                                client.publish(MQTT_TOPIC, JSON.stringify({ id: device.id, status: device.status === "On" ? "Off" : "On" }));
+                                // setIsLoading(true);
+                                // patchDevice(device.id, { status: device.status === "On" ? "Off" : "On" }).then(() => {
+                                //     reloadDevices();
+                                //     setIsLoading(false);
+                                // });
                             }}
                         >
                             {device.status === "On" ? "On" : "Off"}

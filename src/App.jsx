@@ -136,7 +136,9 @@ function App() {
                 )}
                 {!isLoading &&
                     !!devices.length &&
-                    devices.map(device => <DeviceCard key={device.id} device={device} reloadDevices={reloadDevices} reloadDevice={reloadDevice} />)}
+                    devices.map(device => (
+                        <DeviceCard key={device.id} device={device} reloadDevices={reloadDevices} reloadDevice={reloadDevice} client={client} />
+                    ))}
             </Stack>
         </Stack>
     );
