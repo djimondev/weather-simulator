@@ -101,7 +101,6 @@ export const DeviceCard = ({ device, reloadDevices, reloadDevice }) => {
                             {device.status === "On" ? "On" : "Off"}
                         </ToggleButton>
                         <Slider
-                            defaultValue={device.temperature}
                             disabled={device.status === "Off"}
                             step={10}
                             marks
@@ -118,7 +117,6 @@ export const DeviceCard = ({ device, reloadDevices, reloadDevice }) => {
                             }}
                         />
                         <Slider
-                            defaultValue={device.humidity}
                             disabled={device.status === "Off"}
                             step={10}
                             marks
