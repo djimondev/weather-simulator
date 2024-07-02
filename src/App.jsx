@@ -23,14 +23,21 @@ function App() {
         }
     };
 
+    const managePayload = payload => {
+        const d = JSON.parse(payload);
+        if (d?.id) {
+            setDevices(devices.map(device => (device.id === d.id ? d : device)));
+        }
+    };
+
     useEffect(() => {
         if (client) {
             client.on("connect", () => {
                 setConnectStatus("Connected");
                 client.subscribe(import.meta.env.VITE_MQTT_TOPIC, err => {
-                    if (!err) {
-                        client.publish(import.meta.env.VITE_MQTT_TOPIC, "Web client connected");
-                    }
+                    // if (!err) {
+                    //     client.publish(import.meta.env.VITE_MQTT_TOPIC, "Web client connected");
+                    // }
                 });
             });
             client.on("error", err => {
@@ -43,6 +50,7 @@ function App() {
                 console.log(topic, message.toString());
                 // const payload = { topic, message: message.toString() };
                 setPayload(message.toString());
+                managePayload(message.toString());
             });
         }
     }, [client]);
@@ -137,7 +145,14 @@ function App() {
                 {!isLoading &&
                     !!devices.length &&
                     devices.map(device => (
-                        <DeviceCard key={device.id} device={device} reloadDevices={reloadDevices} reloadDevice={reloadDevice} client={client} />
+                        <DeviceCard
+                            key={device.id}
+                            device={device}
+                            reloadDevices={reloadDevices}
+                            reloadDevice={reloadDevice}
+                            client={client}
+                            connectStatus={connectStatus}
+                        />
                     ))}
             </Stack>
         </Stack>

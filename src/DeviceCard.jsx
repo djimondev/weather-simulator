@@ -14,14 +14,23 @@ import {
     ToggleButton,
     Typography
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { deleteDevice } from "./services/devices";
 
 const MQTT_TOPIC = import.meta.env.VITE_MQTT_TOPIC;
 
-export const DeviceCard = ({ device, reloadDevices, reloadDevice, client }) => {
+export const DeviceCard = ({ device, reloadDevices, reloadDevice, client, connectStatus }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
+    const [temperature, setTemperature] = useState(Number(device.temperature) || 0);
+    const [humidity, setHumidity] = useState(Number(device.humidity) || 0);
+    const [status, setStatus] = useState(device.status || "Off");
+
+    useEffect(() => {
+        setTemperature(Number(device.temperature));
+        setHumidity(Number(device.humidity));
+        setStatus(device.status);
+    }, [device]);
 
     const handleClick = event => {
         console.log(event.currentTarget);
@@ -91,9 +100,11 @@ export const DeviceCard = ({ device, reloadDevices, reloadDevice, client }) => {
                     <Stack spacing={2} direction="column" width={"100%"} mx={2}>
                         <ToggleButton
                             value="check"
-                            selected={device.status === "On"}
+                            selected={status === "On"}
                             onClick={() => {
-                                client.publish(MQTT_TOPIC, JSON.stringify({ id: device.id, status: device.status === "On" ? "Off" : "On" }));
+                                setStatus(status === "On" ? "Off" : "On");
+                                connectStatus === "Connected" &&
+                                    client.publish(MQTT_TOPIC, JSON.stringify({ ...device, status: device.status === "On" ? "Off" : "On" }));
                                 // setIsLoading(true);
                                 // patchDevice(device.id, { status: device.status === "On" ? "Off" : "On" }).then(() => {
                                 //     reloadDevices();
@@ -104,13 +115,15 @@ export const DeviceCard = ({ device, reloadDevices, reloadDevice, client }) => {
                             {device.status === "On" ? "On" : "Off"}
                         </ToggleButton>
                         <Slider
-                            disabled={device.status === "Off"}
+                            disabled={device?.status === "Off" || !device}
                             step={10}
                             marks
                             min={-20}
                             max={70}
+                            value={Number(temperature) || 0}
                             onChange={e => {
-                                client.publish(MQTT_TOPIC, JSON.stringify({ id: device.id, temperature: e.target.value }));
+                                setTemperature(e.target.value);
+                                connectStatus === "Connected" && client.publish(MQTT_TOPIC, JSON.stringify({ ...device, temperature: e.target.value }));
                                 // setIsLoading(true);
                                 // patchDevice(device.id, { temperature: e.target.value }).then(() => {
                                 //     setTimeout(() => {
@@ -121,13 +134,15 @@ export const DeviceCard = ({ device, reloadDevices, reloadDevice, client }) => {
                             }}
                         />
                         <Slider
-                            disabled={device.status === "Off"}
+                            disabled={device?.status === "Off" || !device}
                             step={10}
                             marks
                             min={0}
                             max={100}
+                            value={Number(humidity) || 0}
                             onChange={e => {
-                                client.publish(MQTT_TOPIC, JSON.stringify({ id: device.id, humidity: e.target.value }));
+                                setHumidity(e.target.value);
+                                connectStatus === "Connected" && client.publish(MQTT_TOPIC, JSON.stringify({ ...device, humidity: e.target.value }));
                                 // setIsLoading(true);
                                 // patchDevice(device.id, { humidity: e.target.value }).then(() => {
                                 //     setTimeout(() => {
