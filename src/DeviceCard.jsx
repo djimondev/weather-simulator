@@ -15,7 +15,7 @@ import {
     Typography
 } from "@mui/material";
 import { useState } from "react";
-import { deleteDevice, patchDevice } from "./services/devices";
+import { deleteDevice } from "./services/devices";
 
 const MQTT_TOPIC = import.meta.env.VITE_MQTT_TOPIC;
 
@@ -110,13 +110,14 @@ export const DeviceCard = ({ device, reloadDevices, reloadDevice, client }) => {
                             min={-20}
                             max={70}
                             onChange={e => {
-                                setIsLoading(true);
-                                patchDevice(device.id, { temperature: e.target.value }).then(() => {
-                                    setTimeout(() => {
-                                        reloadDevices();
-                                        setIsLoading(false);
-                                    }, 500);
-                                });
+                                client.publish(MQTT_TOPIC, JSON.stringify({ id: device.id, temperature: e.target.value }));
+                                // setIsLoading(true);
+                                // patchDevice(device.id, { temperature: e.target.value }).then(() => {
+                                //     setTimeout(() => {
+                                //         reloadDevices();
+                                //         setIsLoading(false);
+                                //     }, 500);
+                                // });
                             }}
                         />
                         <Slider
@@ -126,13 +127,14 @@ export const DeviceCard = ({ device, reloadDevices, reloadDevice, client }) => {
                             min={0}
                             max={100}
                             onChange={e => {
-                                setIsLoading(true);
-                                patchDevice(device.id, { humidity: e.target.value }).then(() => {
-                                    setTimeout(() => {
-                                        reloadDevices();
-                                        setIsLoading(false);
-                                    }, 500);
-                                });
+                                client.publish(MQTT_TOPIC, JSON.stringify({ id: device.id, humidity: e.target.value }));
+                                // setIsLoading(true);
+                                // patchDevice(device.id, { humidity: e.target.value }).then(() => {
+                                //     setTimeout(() => {
+                                //         reloadDevices();
+                                //         setIsLoading(false);
+                                //     }, 500);
+                                // });
                             }}
                         />
                     </Stack>
