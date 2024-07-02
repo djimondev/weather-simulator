@@ -26,10 +26,10 @@ export const DeviceCard = ({ device, reloadDevices, reloadDevice, client, connec
     const [humidity, setHumidity] = useState(Number(device.humidity) || 0);
     const [status, setStatus] = useState(device.status || "Off");
     const [isFocused, setIsFocused] = useState(false);
+    const [updatedAt, setUpdatedAt] = useState(device.updatedAt);
 
     useEffect(() => {
         if (!payload) return;
-        console.log(payload);
         try {
             const data = JSON.parse(payload);
             if (data.id !== device.id) return;
@@ -37,9 +37,6 @@ export const DeviceCard = ({ device, reloadDevices, reloadDevice, client, connec
             data.humidity !== undefined && setHumidity(Number(data.humidity));
             data.status !== undefined && setStatus(data.status);
             setIsFocused(true);
-            setTimeout(() => {
-                setIsFocused(false);
-            }, 1000);
         } catch (error) {
             console.log(error);
         }
@@ -146,6 +143,11 @@ export const DeviceCard = ({ device, reloadDevices, reloadDevice, client, connec
                                 connectStatus === "Connected" && client.publish(MQTT_TOPIC, JSON.stringify({ id: device.id, humidity: e.target.value }));
                             }}
                         />
+                        {updatedAt && (
+                            <Stack spacing={2} direction="row" width={"100%"} justifyContent={"center"} alignItems={"center"}>
+                                <Typography variant="caption">Last updated: {new Date(updatedAt).toLocaleString()}</Typography>
+                            </Stack>
+                        )}
                     </Stack>
                 </CardActions>
             </Card>

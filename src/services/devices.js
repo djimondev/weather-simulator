@@ -27,7 +27,10 @@ export const updateDevice = async device => {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(device)
+        body: JSON.stringify({
+            ...device,
+            updatedAt: new Date()
+        })
     });
     return response.json();
 };
@@ -38,7 +41,10 @@ export const patchDevice = async (id, param) => {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(param)
+        body: JSON.stringify({
+            ...param,
+            updatedAt: new Date()
+        })
     });
     return response.json();
 };
