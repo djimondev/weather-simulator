@@ -19,18 +19,31 @@ import { deleteDevice } from "./services/devices";
 
 const MQTT_TOPIC = import.meta.env.VITE_MQTT_TOPIC;
 
-export const DeviceCard = ({ device, reloadDevices, reloadDevice, client, connectStatus }) => {
+export const DeviceCard = ({ device, reloadDevices, reloadDevice, client, connectStatus, payload }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
     const [temperature, setTemperature] = useState(Number(device.temperature) || 0);
     const [humidity, setHumidity] = useState(Number(device.humidity) || 0);
     const [status, setStatus] = useState(device.status || "Off");
+    const [isFocused, setIsFocused] = useState(false);
 
     useEffect(() => {
-        setTemperature(Number(device.temperature));
-        setHumidity(Number(device.humidity));
-        setStatus(device.status);
-    }, [device]);
+        if (!payload) return;
+        console.log(payload);
+        try {
+            const data = JSON.parse(payload);
+            if (data.id !== device.id) return;
+            data.temperature !== undefined && setTemperature(Number(data.temperature));
+            data.humidity !== undefined && setHumidity(Number(data.humidity));
+            data.status !== undefined && setStatus(data.status);
+            setIsFocused(true);
+            setTimeout(() => {
+                setIsFocused(false);
+            }, 1000);
+        } catch (error) {
+            console.log(error);
+        }
+    }, [payload]);
 
     const handleClick = event => {
         console.log(event.currentTarget);
@@ -59,7 +72,7 @@ export const DeviceCard = ({ device, reloadDevices, reloadDevice, client, connec
                 <MenuItem onClick={handleClose}>Edit</MenuItem>
                 <MenuItem onClick={handleDelete}>Delete</MenuItem>
             </Menu>
-            <Card style={{ minWidth: "15vw", padding: "0 30px" }}>
+            <Card style={{ minWidth: "15vw", padding: "0 30px", ...(isFocused && { backgroundColor: "#b5d3b5" }) }}>
                 <CardHeader
                     title={
                         <Stack spacing={2} direction="row" width={"100%"} justifyContent={"space-between"} alignItems={"start"}>
@@ -84,15 +97,15 @@ export const DeviceCard = ({ device, reloadDevices, reloadDevice, client, connec
                     <Stack py={2} spacing={1} direction="column" width={"100%"} justifyContent={"center"} alignItems={"center"}>
                         <Stack spacing={2} direction="row" width={"100%"} justifyContent={"center"} alignItems={"center"}>
                             <Typography variant="body1">Status:</Typography>
-                            <Typography variant="h6">{device.status}</Typography>
+                            <Typography variant="h6">{status}</Typography>
                         </Stack>
                         <Stack spacing={2} direction="row" width={"100%"} justifyContent={"center"} alignItems={"center"}>
                             <Typography variant="body1">Temperature:</Typography>
-                            <Typography variant="h6">{device.temperature}°C</Typography>
+                            <Typography variant="h6">{temperature}°C</Typography>
                         </Stack>
                         <Stack spacing={2} direction="row" width={"100%"} justifyContent={"center"} alignItems={"center"}>
                             <Typography variant="body1">Humidity:</Typography>
-                            <Typography variant="h6">{device.humidity}%</Typography>
+                            <Typography variant="h6">{humidity}%</Typography>
                         </Stack>
                     </Stack>
                 </CardContent>
@@ -104,18 +117,13 @@ export const DeviceCard = ({ device, reloadDevices, reloadDevice, client, connec
                             onClick={() => {
                                 setStatus(status === "On" ? "Off" : "On");
                                 connectStatus === "Connected" &&
-                                    client.publish(MQTT_TOPIC, JSON.stringify({ ...device, status: device.status === "On" ? "Off" : "On" }));
-                                // setIsLoading(true);
-                                // patchDevice(device.id, { status: device.status === "On" ? "Off" : "On" }).then(() => {
-                                //     reloadDevices();
-                                //     setIsLoading(false);
-                                // });
+                                    client.publish(MQTT_TOPIC, JSON.stringify({ id: device.id, status: status === "On" ? "Off" : "On" }));
                             }}
                         >
-                            {device.status === "On" ? "On" : "Off"}
+                            {status === "On" ? "On" : "Off"}
                         </ToggleButton>
                         <Slider
-                            disabled={device?.status === "Off" || !device}
+                            disabled={status === "Off"}
                             step={10}
                             marks
                             min={-20}
@@ -123,18 +131,11 @@ export const DeviceCard = ({ device, reloadDevices, reloadDevice, client, connec
                             value={Number(temperature) || 0}
                             onChange={e => {
                                 setTemperature(e.target.value);
-                                connectStatus === "Connected" && client.publish(MQTT_TOPIC, JSON.stringify({ ...device, temperature: e.target.value }));
-                                // setIsLoading(true);
-                                // patchDevice(device.id, { temperature: e.target.value }).then(() => {
-                                //     setTimeout(() => {
-                                //         reloadDevices();
-                                //         setIsLoading(false);
-                                //     }, 500);
-                                // });
+                                connectStatus === "Connected" && client.publish(MQTT_TOPIC, JSON.stringify({ id: device.id, temperature: e.target.value }));
                             }}
                         />
                         <Slider
-                            disabled={device?.status === "Off" || !device}
+                            disabled={status === "Off"}
                             step={10}
                             marks
                             min={0}
@@ -142,14 +143,7 @@ export const DeviceCard = ({ device, reloadDevices, reloadDevice, client, connec
                             value={Number(humidity) || 0}
                             onChange={e => {
                                 setHumidity(e.target.value);
-                                connectStatus === "Connected" && client.publish(MQTT_TOPIC, JSON.stringify({ ...device, humidity: e.target.value }));
-                                // setIsLoading(true);
-                                // patchDevice(device.id, { humidity: e.target.value }).then(() => {
-                                //     setTimeout(() => {
-                                //         reloadDevices();
-                                //         setIsLoading(false);
-                                //     }, 500);
-                                // });
+                                connectStatus === "Connected" && client.publish(MQTT_TOPIC, JSON.stringify({ id: device.id, humidity: e.target.value }));
                             }}
                         />
                     </Stack>

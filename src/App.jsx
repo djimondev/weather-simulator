@@ -23,22 +23,11 @@ function App() {
         }
     };
 
-    const managePayload = payload => {
-        const d = JSON.parse(payload);
-        if (d?.id) {
-            setDevices(devices.map(device => (device.id === d.id ? d : device)));
-        }
-    };
-
     useEffect(() => {
         if (client) {
             client.on("connect", () => {
                 setConnectStatus("Connected");
-                client.subscribe(import.meta.env.VITE_MQTT_TOPIC, err => {
-                    // if (!err) {
-                    //     client.publish(import.meta.env.VITE_MQTT_TOPIC, "Web client connected");
-                    // }
-                });
+                client.subscribe(import.meta.env.VITE_MQTT_TOPIC, err => {});
             });
             client.on("error", err => {
                 client.end();
@@ -47,10 +36,7 @@ function App() {
                 setConnectStatus("Reconnecting");
             });
             client.on("message", (topic, message) => {
-                console.log(topic, message.toString());
-                // const payload = { topic, message: message.toString() };
                 setPayload(message.toString());
-                managePayload(message.toString());
             });
         }
     }, [client]);
@@ -152,6 +138,7 @@ function App() {
                             reloadDevice={reloadDevice}
                             client={client}
                             connectStatus={connectStatus}
+                            payload={payload}
                         />
                     ))}
             </Stack>
